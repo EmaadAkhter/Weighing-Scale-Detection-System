@@ -181,4 +181,3 @@ The system includes a 3-tier testing strategy:
 ├── yolo11s.pt                    # Pre-trained YOLOv11 Small Base
 └── yolov8n.pt                    # Pre-trained YOLOv8 Nano Base
 ```
-```
