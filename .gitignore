@@ -1,0 +1,29 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+.env
+
+# Datasets
+v5-display-l.coco/
+My First Project.v5-display-l.coco/
+*.zip
+
+# Training Artifacts & Models
+runs/
+*.pt
+*.pth
+
+# Outputs
+test_output/
+output/
+
+# IDE / OS
+.DS_Store
+.vscode/
+.idea/
