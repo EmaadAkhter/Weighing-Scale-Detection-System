@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+venv/
+env/
+.venv
+ENV/
+
+# Datasets (too large for Docker image)
+v5-display-l.coco/
+My First Project.v5-display-l.coco/
+
+# Training artifacts (except weights which we copy explicitly)
+runs/detect/val/
+runs/detect/val2/
+runs/detect/train/*.png
+runs/detect/train/*.jpg
+runs/detect/train/*.csv
+runs/detect/train/args.yaml
+
+# Test outputs
+test_output/
+output/
+
+# Training scripts (not needed in API container)
+training/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+
+# Pre-trained model (downloaded during build if needed)
+yolov8n.pt

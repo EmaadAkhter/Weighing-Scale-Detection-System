@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  scale-detection-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scale-detection-api
+    ports:
+      - "8010:8010"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Mount model weights (read-only)
+      - ./runs/detect/train/weights:/app/runs/detect/train/weights:ro
+      # Optional: Mount for live code updates during development
+      # - ./app:/app/app
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8010/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - scale-detection-network
+
+networks:
+  scale-detection-network:
+    driver: bridge

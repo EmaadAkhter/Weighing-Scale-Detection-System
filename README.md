@@ -54,7 +54,35 @@ The model was trained for 30 epochs on an M-series Mac (MPS acceleration).
 
 ## Installation & Usage
 
-### 1. Setup
+### Option 1: Docker (Recommended for Production)
+
+**Quick Start:**
+```bash
+# Build and run with docker-compose
+docker-compose up -d
+
+# Check logs
+docker-compose logs -f
+
+# Stop service
+docker-compose down
+```
+
+**Manual Docker Build:**
+```bash
+# Build image
+docker build -t scale-detection:latest .
+
+# Run container
+docker run -d -p 8010:8010 --name scale-detection-api scale-detection:latest
+```
+
+*   **API Docs**: `http://localhost:8010/docs`
+*   **Health Check**: `http://localhost:8010/`
+
+### Option 2: Local Development Setup
+
+**1. Setup Environment**
 ```bash
 # Create virtual environment
 python3 -m venv venv
@@ -64,7 +92,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Run the Web Service (API)
+**2. Run the Web Service (API)**
 Start the FastAPI server:
 ```bash
 uvicorn app.main:app --port 8010 --reload
@@ -74,19 +102,19 @@ uvicorn app.main:app --port 8010 --reload
     *   `file`: Image file
     *   `format`: "image" (returns annotated jpeg) or "json" (returns coordinates)
 
-### 3. Run the CLI
+**3. Run the CLI**
 Detect objects in a local image:
 ```bash
 python cli/main.py path/to/image.jpg --output ./output
 ```
 
-### 4. Run System Tests
+**4. Run System Tests**
 Verify the entire pipeline (Accuracy > 0.5 IoU required):
 ```bash
 python scripts/test_system.py
 ```
 
-### 5. Training (Reproduce Results)
+**5. Training (Reproduce Results)**
 ```bash
 python training/train.py
 ```
