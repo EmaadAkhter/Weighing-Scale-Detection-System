@@ -24,6 +24,7 @@ I initially considered Detectron2 (Faster R-CNN) but switched to **YOLOv8** for 
 *   **Format**: Converted COCO JSON annotations to standard YOLO TXT format [class x_center y_center width height].
 *   **Split**: utilized a Train/Val/Test split to ensure robust evaluation.
 *   **Training**: Trained for 30 epochs with default augmentation to prevent overfitting on the small dataset.
+*   **Download**: [Access Dataset Here](https://drive.google.com/drive/folders/1BWuMFP8JNYG5OT_zTo1JkrP_RXd7R5Dh)
 
 ---
 
@@ -96,19 +97,68 @@ python training/train.py
 
 ```text
 .
-├── app/                  # Web Service Source
-│   ├── routes/           # API Endpoints
-│   ├── model/            # Model Loading Logic
-│   ├── utils/            # Image Processing
-│   ├── dependencies/     # Dependency Injection
-│   └── main.py           # App Entry Point
-├── cli/                  # Command Line Tools
-│   └── main.py           # CLI Entry Point
-├── training/             # Training Pipeline
-│   ├── train.py          # Training Script
-│   ├── test.py           # Evaluation Script
-│   └── prepare_data.py   # Data Formatting
-├── scripts/              # Verification Scripts
-├── runs/                 # Training Artifacts (Weights, Logs, Graphs)
-└── requirements.txt      # Dependencies
+├── app/                          # Web Service (FastAPI)
+│   ├── __init__.py
+│   ├── main.py                   # FastAPI Application Entry Point
+│   ├── dependencies/             # Dependency Injection
+│   │   ├── __init__.py
+│   │   └── core.py               # Model Dependency Provider
+│   ├── model/                    # Model Management
+│   │   ├── __init__.py
+│   │   └── loader.py             # YOLOv8 Model Loader (Singleton)
+│   ├── routes/                   # API Endpoints
+│   │   ├── __init__.py
+│   │   └── detection.py          # /detect Endpoint (Image & JSON)
+│   └── utils/                    # Utilities
+│       ├── __init__.py
+│       └── image.py              # Image Processing Functions
+│
+├── cli/                          # Command Line Interface
+│   ├── __init__.py
+│   └── main.py                   # CLI Detection Tool
+│
+├── training/                     # Training & Evaluation
+│   ├── train.py                  # YOLOv8 Training Script
+│   ├── test.py                   # Model Evaluation Script
+│   └── prepare_data.py           # COCO to YOLO Converter
+│
+├── scripts/                      # Testing & Verification
+│   ├── __init__.py
+│   └── test_system.py            # End-to-End System Tests (IoU Validation)
+│
+├── runs/                         # Training Artifacts (Auto-generated)
+│   └── detect/
+│       ├── train/                # Training Run Outputs
+│       │   ├── weights/
+│       │   │   ├── best.pt       # Best Model Weights
+│       │   │   └── last.pt       # Last Epoch Weights
+│       │   ├── results.png       # Training Metrics Graph
+│       │   ├── results.csv       # Training Metrics CSV
+│       │   ├── confusion_matrix.png
+│       │   ├── BoxF1_curve.png
+│       │   ├── BoxPR_curve.png
+│       │   └── args.yaml         # Training Configuration
+│       ├── val/                  # Validation Run 1
+│       └── val2/                 # Validation Run 2
+│
+├── test_output/                  # Test Results (Auto-generated)
+│   ├── annotated_*.jpg           # CLI Annotated Images
+│   └── api_result.jpg            # API Test Result
+│
+├── v5-display-l.coco/            # Dataset (YOLO Format)
+│   ├── data.yaml                 # Dataset Configuration
+│   ├── train/
+│   │   ├── images/               # Training Images
+│   │   └── labels/               # Training Labels (.txt)
+│   ├── valid/
+│   │   ├── images/               # Validation Images
+│   │   └── labels/               # Validation Labels (.txt)
+│   └── test/
+│       ├── images/               # Test Images
+│       └── labels/               # Test Labels (.txt)
+│
+├── requirements.txt              # Python Dependencies
+├── .gitignore                    # Git Ignore Rules
+├── README.md                     # Project Documentation
+└── yolov8n.pt                    # Pre-trained YOLOv8 Nano Model
 ```
