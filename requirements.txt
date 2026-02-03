@@ -11,6 +11,10 @@ ultralytics
 fastapi
 uvicorn
 python-multipart
+pydantic-settings
 
 # Testing
 requests
+pytest
+pytest-asyncio
+httpx

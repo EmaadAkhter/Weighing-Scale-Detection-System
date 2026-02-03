@@ -8,23 +8,34 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Lifespan context manager for FastAPI.
+    Handles startup and shutdown events.
+    """
+    logger.info("Initializing application...")
+    try:
+        ModelLoader().load_model() # Preload model
+    except Exception as e:
+        logger.error(f"Error during model initialization: {e}")
+    
+    yield
+    
+    logger.info("Shutting down application...")
+
 # Initialize FastAPI App
 app = FastAPI(
     title="Weighing Scale Detection API",
     description="API for detecting weighing scales in images using YOLOv8.",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Include Routers
 app.include_router(detection.router)
-
-@app.on_event("startup")
-async def startup_event():
-    """
-    Initialize resources on startup.
-    """
-    logger.info("Initializing application...")
-    ModelLoader().load_model() # Preload model
 
 @app.get("/", tags=["Health"])
 def health_check():

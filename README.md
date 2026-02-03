@@ -52,6 +52,23 @@ The model was trained for 30 epochs on an M-series Mac (MPS acceleration).
 
 ---
 
+## Configuration
+
+The application supports environment-based configuration. Copy `.env.example` to `.env` and customize:
+
+```bash
+cp .env.example .env
+```
+
+**Key Configuration Options:**
+- `MODEL_PATH`: Path to trained model weights
+- `CONFIDENCE_THRESHOLD`: Minimum confidence for detections (0.0-1.0)
+- `IOU_THRESHOLD`: IOU threshold for NMS (0.0-1.0)
+- `MAX_FILE_SIZE_MB`: Maximum upload file size
+- `LOG_LEVEL`: Logging verbosity (INFO, DEBUG, WARNING, ERROR)
+
+---
+
 ## Installation & Usage
 
 ### Option 1: Docker (Recommended for Production)
@@ -99,13 +116,21 @@ uvicorn app.main:app --port 8010 --reload
 ```
 *   **Docs**: `http://localhost:8010/docs`
 *   **Endpoint**: `POST /detect`
-    *   `file`: Image file
-    *   `format`: "image" (returns annotated jpeg) or "json" (returns coordinates)
+    *   `file`: Image file (JPEG/PNG, max 10MB)
+    *   `format`: "image" (annotated jpeg) or "json" (coordinates) - optional
 
 **3. Run the CLI**
-Detect objects in a local image:
+#### CLI Usage
 ```bash
-python cli/main.py path/to/image.jpg --output ./output
+# Run detection on an image
+python cli/main.py path/to/image.jpg --output results
+```
+
+#### API Usage
+```bash
+# Detect object and get JSON result
+curl -X POST "http://localhost:8010/detect?format=json" \
+  -F "file=@sample.jpg"
 ```
 
 **4. Run System Tests**

@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 # Config
 DATASET_DIR = Path("v5-display-l.coco")
-API_URL = "http://127.0.0.1:8010"
+API_URL = "http://127.0.0.1:8012"
 CLI_SCRIPT = "cli/main.py"
 OUTPUT_DIR = "test_output"
 
@@ -119,22 +119,24 @@ def run_tests():
         logger.error("No samples found.")
         return
 
-    # Pick 3 random samples
-    selected_samples = random.sample(all_samples, min(3, len(all_samples)))
+    # Pick 5 random samples
+    selected_samples = random.sample(all_samples, min(5, len(all_samples)))
     
     logger.info(f"Selected {len(selected_samples)} samples for verification.")
     
     # ------------------
     # Start API Server
     # ------------------
-    logger.info("Starting API Server...")
+    logger.info("Starting API Server on port 8012...")
     python_executable = sys.executable
+    # Try to find uvicorn in the same bin dir as python
     uvicorn_executable = str(Path(python_executable).parent / "uvicorn")
     
     server_process = subprocess.Popen(
-        [uvicorn_executable, "app.main:app", "--port", "8010", "--host", "127.0.0.1"],
+        [uvicorn_executable, "app.main:app", "--port", "8012", "--host", "127.0.0.1"],
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
+        stderr=subprocess.PIPE,
+        env={**os.environ, "PYTHONPATH": "."}
     )
     time.sleep(5) # warmup
 
@@ -148,30 +150,34 @@ def run_tests():
             logger.info(f"\n--- Test Case {i+1}: {img_path.name} ---")
             
             # 1. Test CLI
-            # We capture stdout looking for "DETECTION_RESULT: {...}"
             cmd = [python_executable, CLI_SCRIPT, str(img_path), "--output", OUTPUT_DIR]
-            cli_res = subprocess.run(cmd, capture_output=True, text=True)
+            cli_res = subprocess.run(cmd, capture_output=True, text=True, env={**os.environ, "PYTHONPATH": "."})
             
             cli_bbox = None
             for line in cli_res.stdout.splitlines():
                 if "DETECTION_RESULT:" in line:
                     val = line.split("DETECTION_RESULT:")[1].strip()
                     if val != "None":
-                        # safe eval? it's our own string
                         import ast
                         data = ast.literal_eval(val)
                         cli_bbox = data['bbox']
             
             # 2. Test API
             with open(img_path, "rb") as f:
-                # pass format=json
-                resp = requests.post(f"{API_URL}/detect?format=json", files={"file": f})
+                resp = requests.post(
+                    f"{API_URL}/detect?format=json",
+                    files={"file": (img_path.name, f, "image/jpeg")}
+                )
             
             api_bbox = None
             if resp.status_code == 200:
                 data = resp.json()
                 if data.get("detected"):
                     api_bbox = data['prediction']['bbox']
+                else:
+                    logger.warning(f"API returned detected: False. Response: {data}")
+            else:
+                logger.error(f"API request failed with status {resp.status_code}: {resp.text}")
             
             # Verification
             logger.info(f"Ground Truth (xywh): {gt_bbox}")
