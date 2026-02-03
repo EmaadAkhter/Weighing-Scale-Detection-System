@@ -187,6 +187,9 @@ python training/train.py
 │
 ├── requirements.txt              # Python Dependencies
 ├── .gitignore                    # Git Ignore Rules
+├── Dockerfile                    # Docker Image Definition
+├── docker-compose.yml            # Docker Compose Configuration
+├── .dockerignore                 # Docker Build Exclusions
 ├── README.md                     # Project Documentation
 └── yolov8n.pt                    # Pre-trained YOLOv8 Nano Model
 ```
