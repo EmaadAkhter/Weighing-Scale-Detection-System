@@ -8,7 +8,7 @@ import argparse
 from pathlib import Path
 from ultralytics import YOLO
 
-def train_yolo(data_dir, output_dir, epochs=30, batch_size=32, device='cpu'):
+def train_yolo(data_dir, output_dir, model_name="yolov8n.pt", epochs=30, batch_size=32, device='cpu'):
     # Handle data path: if directory provided, look for data.yaml inside
     data_path = Path(data_dir)
     if data_path.is_dir():
@@ -22,7 +22,8 @@ def train_yolo(data_dir, output_dir, epochs=30, batch_size=32, device='cpu'):
     print(f"Using data config: {data_yaml}")
     
     # Load a model
-    model = YOLO("yolov8n.pt")  # load a pretrained model (recommended for training)
+    print(f"Loading base model: {model_name}")
+    model = YOLO(model_name)
 
     print(f"Starting training on device: {device}")
     
@@ -47,13 +48,14 @@ def train_yolo(data_dir, output_dir, epochs=30, batch_size=32, device='cpu'):
     return results
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Train YOLOv8 for Weighing Scale Detection")
+    parser = argparse.ArgumentParser(description="Train YOLO for Weighing Scale Detection")
     parser.add_argument("--data_dir", type=str, default="./v5-display-l.coco", help="Path to dataset directory (containing data.yaml) or path to data.yaml")
     parser.add_argument("--output_dir", type=str, default="runs/detect/train", help="Directory where results will be saved")
+    parser.add_argument("--model", type=str, default="yolov8n.pt", help="Base model to train (e.g., yolov8n.pt, yolo11s.pt, yolov8s.pt)")
     parser.add_argument("--epochs", type=int, default=30, help="Number of epochs")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
     parser.add_argument("--device", type=str, default="mps", help="Device to train on (cpu, mps, cuda)")
     
     args = parser.parse_args()
     
-    train_yolo(args.data_dir, args.output_dir, args.epochs, args.batch_size, args.device)
+    train_yolo(args.data_dir, args.output_dir, args.model, args.epochs, args.batch_size, args.device)
